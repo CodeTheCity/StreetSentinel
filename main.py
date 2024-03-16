@@ -1,9 +1,11 @@
 import requests
 import json
 import csv
+import os
 
 BASE_URL = "https://integration.aberdeencity.gov.uk"
 MAP_INTEGRATION_URL = BASE_URL + "/apibroker/runLookup?id=5ba25e5ed7042"
+OUTPUT_PATH = "_data/roads.csv"
 
 payload = json.dumps(
     {
@@ -128,7 +130,9 @@ header = [
     "Last updated",
 ]
 
-with open("roads.csv", "w", newline="") as f:
+os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+
+with open(OUTPUT_PATH, "w", newline="") as f:
     csv_writer = csv.writer(f)
 
     csv_writer.writerow(header)

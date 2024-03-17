@@ -38,7 +38,7 @@ title: "Home"
 
 <h2>Map</h2>
 
-<div id="map" style="height:400px;"></div>
+<div id="map" style="height:500px;"></div>
 
 <script id="roadsData" type="application/json">
     {{ site.data.roads | jsonify }}
@@ -72,7 +72,7 @@ title: "Home"
 
     mostCommonDefectElement.innerHTML = `${mostCommonDefect}<br>${defectTypes[mostCommonDefect].length.toLocaleString()} reports`;
 
-    var map = L.map('map').setView([57.148690, -2.099241], 11);
+    var map = L.map('map').setView([57.148690, -2.099241], 12);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

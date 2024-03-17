@@ -149,6 +149,14 @@ title: "Home"
             extraClasses: "fa-solid"
         });
         var marker = L.marker([parseFloat(defect.Lat), parseFloat(defect.Lng)], { icon: icon });
+
+        var popupText = `<p class="h5">${defect["Problem type"]}</p>
+            <ul class="list-unstyled">
+                <li><strong>Reported:</strong> ${defect["Reported date"]}</li>
+            </ul>`;
+        debugger;
+
+        marker.bindPopup(popupText)
         mapLayer.addLayer(marker);
     });
 
@@ -156,7 +164,7 @@ title: "Home"
 
     // Defects by type
     var sortedDefectsByType = Object.fromEntries(
-        Object.entries(defectTypes).sort(([, a], [, b]) =>b.length - a.length)
+        Object.entries(defectTypes).sort(([, a], [, b]) => b.length - a.length)
     );
 
     var defectsByTypeHtml = Object.keys(sortedDefectsByType).map(x => {

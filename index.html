@@ -137,24 +137,45 @@ title: "Home"
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    var mapLayer = L.markerClusterGroup();
+    var mapLayer = L.markerClusterGroup({maxClusterRadius: 40});
 
     roadsData.forEach(defect => {
+        var defectReportedDate = Date.parse(defect["Reported date"]);
+        var defectReportedDateFormatted = new Date(defectReportedDate).toLocaleDateString('en-GB', { year: "numeric", month: "short", day: "numeric" });
+        var defectAge = Math.round(Math.abs((defectReportedDate - today) / oneDay));
+        var defectAgeFormatted = defectAge.toLocaleString();
+
+        var iconColour = "";
+
+        if (defectAge >= 365) {
+            iconColour = "red";
+        }
+        else if (defectAge >= 183) {
+            iconColour = "amber";
+        }
+        else if (defectAge >= 92)
+        {
+            iconColour = "blue";
+        }
+        else {
+            iconColour = "green";
+        }
+
         var iconClass = iconMap[defect["Problem type"]];
 
         var icon = L.AwesomeMarkers.icon({
             icon: iconClass,
             prefix: "fa",
-            markerColor: "red",
+            markerColor: iconColour,
             extraClasses: "fa-solid"
         });
         var marker = L.marker([parseFloat(defect.Lat), parseFloat(defect.Lng)], { icon: icon });
 
         var popupText = `<p class="h5">${defect["Problem type"]}</p>
             <ul class="list-unstyled">
-                <li><strong>Reported:</strong> ${defect["Reported date"]}</li>
+                <li><strong>Reported:</strong> ${defectReportedDateFormatted}</li>
+                <li><strong>Age:</strong> ${defectAgeFormatted} day(s) old</li>
             </ul>`;
-        debugger;
 
         marker.bindPopup(popupText)
         mapLayer.addLayer(marker);

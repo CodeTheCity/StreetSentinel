@@ -9,7 +9,7 @@ title: "Home"
             <div class="card-body">
                 <p class="card-title h4">No. of outstanding defects</p>
                 <p class="card-text text-center fs-1 fw-bold" id="defectTotal">
-                    
+
                 </p>
             </div>
         </div>
@@ -19,7 +19,7 @@ title: "Home"
             <div class="card-body">
                 <p class="card-title h4">Oldest outstanding defect</p>
                 <p class="card-text text-center fs-1 fw-bold" id="oldestDefect">
-                    
+
                 </p>
             </div>
         </div>
@@ -29,7 +29,7 @@ title: "Home"
             <div class="card-body">
                 <p class="card-title h4">Most common defect</p>
                 <p class="card-text text-center fs-1 fw-bold" id="mostCommonDefect">
-                    
+
                 </p>
             </div>
         </div>
@@ -65,10 +65,10 @@ title: "Home"
     var oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
     var today = new Date();
     var diffDays = Math.round(Math.abs((oldestDate - today) / oneDay)).toLocaleString();
-    oldestDefectElement.innerHTML = `${diffDays} days<br>(${oldestDate.toLocaleDateString('en-GB', {  year:"numeric", month:"short", day:"numeric"}) })`;
+    oldestDefectElement.innerHTML = `${diffDays} days<br>(${oldestDate.toLocaleDateString('en-GB', { year: "numeric", month: "short", day: "numeric" })})`;
 
     var defectTypes = Object.groupBy(roadsData, report => report["Problem type"]);
-    var mostCommonDefect = Object.keys(defectTypes).reduce(function(a, b){ return defectTypes[a] > defectTypes[b] ? a : b });
+    var mostCommonDefect = Object.keys(defectTypes).reduce(function (a, b) { return defectTypes[a] > defectTypes[b] ? a : b });
 
     mostCommonDefectElement.innerHTML = `${mostCommonDefect}<br>${defectTypes[mostCommonDefect].length.toLocaleString()} reports`;
 
@@ -81,11 +81,16 @@ title: "Home"
     var mapLayer = L.markerClusterGroup();
 
     roadsData.forEach(defect => {
-
-        var marker = L.marker([parseFloat(defect.Lat),parseFloat(defect.Lng)]);
+        var icon = L.AwesomeMarkers.icon({
+            icon: "exclamation",
+            prefix: "fa",
+            markerColor: "red",
+            extraClasses: "fa-solid"
+        });
+        var marker = L.marker([parseFloat(defect.Lat), parseFloat(defect.Lng)], {icon: icon});
         mapLayer.addLayer(marker);
 
-        
+
     });
 
     mapLayer.addTo(map);

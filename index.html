@@ -38,12 +38,29 @@ title: "Home"
 
 <h2>Map</h2>
 
-<div id="map" style="height:500px;"></div>
+<div id="map" style="height:500px;" class="mb-1"></div>
 
-<h3>Key</h3>
-<ul id="mapKey">
 
-</ul>
+<div class="row row-cols-1 row-cols-md-2 g-4 mt-1">
+    <div class="col">
+        <h3>Key</h3>
+        <ul id="mapKey" class="list-group"></ul>
+    </div>
+    <div class="col">
+        <h3>Defects by type</h3>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Defect</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody id="defectsByType">
+
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <script id="roadsData" type="application/json">
     {{ site.data.roads | jsonify }}
@@ -79,10 +96,12 @@ title: "Home"
     var oldestDefectElement = document.getElementById("oldestDefect");
     var mostCommonDefectElement = document.getElementById("mostCommonDefect");
 
+    // No. of outstanding defects
     noOfOustandingDefectsElement.innerText = roadsData
         .length
         .toLocaleString();
 
+    // Oldest outstanding defect
     var reportedDates = roadsData.map(x => Date.parse(x["Reported date"]));
     var oldestDate = new Date(reportedDates.reduce(function (a, b) {
         return a < b
@@ -95,16 +114,19 @@ title: "Home"
     var diffDays = Math.round(Math.abs((oldestDate - today) / oneDay)).toLocaleString();
     oldestDefectElement.innerHTML = `${diffDays} days<br>(${oldestDate.toLocaleDateString('en-GB', { year: "numeric", month: "short", day: "numeric" })})`;
 
+    // Most common defect
     var defectTypes = Object.groupBy(roadsData, report => report["Problem type"]);
     var mostCommonDefect = Object.keys(defectTypes).reduce(function (a, b) { return defectTypes[a] > defectTypes[b] ? a : b });
 
     mostCommonDefectElement.innerHTML = `${mostCommonDefect}<br>${defectTypes[mostCommonDefect].length.toLocaleString()} reports`;
 
+    // Map
     var iconMapElement = document.getElementById("iconMap");
     var iconMap = JSON.parse(iconMapElement.innerHTML);
 
+    // Map key
     var keyHtml = Object.keys(iconMap).map(defectType => {
-        return `<li><i class="fa-solid fa-${iconMap[defectType]}"></i>&nbsp; ${defectType}</li>`;
+        return `<li class="list-group-item"><i class="fa-solid fa-${iconMap[defectType]}"></i>&nbsp; ${defectType}</li>`;
     }).join("");
 
     document.getElementById("mapKey").innerHTML = keyHtml;
@@ -128,11 +150,19 @@ title: "Home"
         });
         var marker = L.marker([parseFloat(defect.Lat), parseFloat(defect.Lng)], { icon: icon });
         mapLayer.addLayer(marker);
-
-
     });
 
     mapLayer.addTo(map);
 
+    // Defects by type
+    var sortedDefectsByType = Object.fromEntries(
+        Object.entries(defectTypes).sort(([, a], [, b]) =>b.length - a.length)
+    );
+
+    var defectsByTypeHtml = Object.keys(sortedDefectsByType).map(x => {
+        return `<tr><td>${x}</td><td>${sortedDefectsByType[x].length.toLocaleString()}</td></tr>`
+    }).join("");
+
+    document.getElementById("defectsByType").innerHTML = defectsByTypeHtml;
 
 </script>

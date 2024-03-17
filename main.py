@@ -2,6 +2,7 @@ import requests
 import json
 import csv
 import os
+import datetime
 
 BASE_URL = "https://integration.aberdeencity.gov.uk"
 MAP_INTEGRATION_URL = BASE_URL + "/apibroker/runLookup?id=5ba25e5ed7042"
@@ -72,8 +73,9 @@ for problem in roads_data:
     problem_type = problem_data[0]
 
     problem_reported_date_string = problem_data[1]
-    problem_reported_date = problem_reported_date_string.split(" ")[3]
-
+    problem_reported_date_string = problem_reported_date_string.split(" ")[3]
+    problem_reported_date = datetime.datetime.strptime(problem_reported_date_string, "%d/%m/%Y")
+    
     problem_primary_action_string = problem_data[2]
     problem_primary_action_split = problem_primary_action_string.strip().split(" ")
     problem_primary_action_type = (

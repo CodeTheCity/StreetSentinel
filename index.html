@@ -1,3 +1,73 @@
 ---
 title: "Home"
 ---
+
+<h1>Overview</h1>
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <p class="card-title h4">No. of outstanding defects</p>
+                <p class="card-text text-center fs-1 fw-bold" id="defectTotal">
+                    ##
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <p class="card-title h4">Oldest outstanding defect</p>
+                <p class="card-text text-center fs-1 fw-bold" id="oldestDefect">
+                    ##
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card">
+            <div class="card-body h4">
+                <p class="card-title">Most common defect</p>
+                <p class="card-text text-center fs-1 fw-bold" id="mostCommonDefect">
+                    ##
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="roadsData" type="application/json">
+    {{ site.data.roads | jsonify }}
+</script>
+<script type="text/javascript">
+    var jsonElement = document.getElementById("roadsData");
+    var roadsData = JSON.parse(jsonElement.innerHTML);
+
+    var noOfOustandingDefectsElement = document.getElementById("defectTotal");
+    var oldestDefectElement = document.getElementById("oldestDefect");
+    var mostCommonDefectElement = document.getElementById("mostCommonDefect");
+
+    noOfOustandingDefectsElement.innerText = roadsData
+        .length
+        .toLocaleString();
+
+    var reportedDates = roadsData.map(x => Date.parse(x["Reported date"]));
+    var oldestDate = new Date(reportedDates.reduce(function (a, b) {
+        return a < b
+            ? a
+            : b;
+    }));
+
+    var oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+    var today = new Date();
+    var diffDays = Math.round(Math.abs((oldestDate - today) / oneDay)).toLocaleString();
+    oldestDefectElement.innerHTML = `${diffDays} days<br>(${oldestDate.toLocaleDateString('en-GB', {  year:"numeric", month:"short", day:"numeric"}) })`;
+
+    var defectTypes = Object.groupBy(roadsData, report => report["Problem type"]);
+    var mostCommonDefect = Object.keys(defectTypes).reduce(function(a, b){ return defectTypes[a] > defectTypes[b] ? a : b });
+
+    mostCommonDefectElement.innerHTML = `${mostCommonDefect}<br>${defectTypes[mostCommonDefect].length.toLocaleString()} reports`;
+
+    debugger;
+
+</script>

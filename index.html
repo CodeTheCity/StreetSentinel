@@ -40,9 +40,37 @@ title: "Home"
 
 <div id="map" style="height:500px;"></div>
 
+<h3>Key</h3>
+<ul id="mapKey">
+
+</ul>
+
 <script id="roadsData" type="application/json">
     {{ site.data.roads | jsonify }}
 </script>
+
+<script id="iconMap" type="application/json">
+    {
+        "Bollard - damaged or missing": "road-barrier",
+        "Cobbles - damaged, missing or uneven": "road-circle-xmark",
+        "Crash barrier - damaged or broken": "road-barrier",
+        "Dangerous overhead wires": "bolt",
+        "Guard rail - damaged or broken": "road-barrier",
+        "Lit bollard - damaged or missing": "road-barrier",
+        "Markings - defective": "xmarks-lines",
+        "Oil or Fuel spill": "fill-drip",
+        "Other - pavement or path related": "shoe-prints",
+        "Other - road related": "road",
+        "Other - road sign related": "signs-post",
+        "Overhanging vegetation": "tree",
+        "Pothole": "road-circle-xmark",
+        "Subsidence": "house-crack",
+        "Uneven surface or cracking": "road-circle-exclamation",
+        "Utility cover - broken, high/low or missing": "road-circle-exclamation",
+        "Zebra or pelican crossing": "person-walking"
+      }    
+</script>
+
 <script type="text/javascript">
     var jsonElement = document.getElementById("roadsData");
     var roadsData = JSON.parse(jsonElement.innerHTML);
@@ -72,6 +100,15 @@ title: "Home"
 
     mostCommonDefectElement.innerHTML = `${mostCommonDefect}<br>${defectTypes[mostCommonDefect].length.toLocaleString()} reports`;
 
+    var iconMapElement = document.getElementById("iconMap");
+    var iconMap = JSON.parse(iconMapElement.innerHTML);
+
+    var keyHtml = Object.keys(iconMap).map(defectType => {
+        return `<li><i class="fa-solid fa-${iconMap[defectType]}"></i>&nbsp; ${defectType}</li>`;
+    }).join("");
+
+    document.getElementById("mapKey").innerHTML = keyHtml;
+
     var map = L.map('map').setView([57.148690, -2.099241], 12);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -81,13 +118,15 @@ title: "Home"
     var mapLayer = L.markerClusterGroup();
 
     roadsData.forEach(defect => {
+        var iconClass = iconMap[defect["Problem type"]];
+
         var icon = L.AwesomeMarkers.icon({
-            icon: "exclamation",
+            icon: iconClass,
             prefix: "fa",
             markerColor: "red",
             extraClasses: "fa-solid"
         });
-        var marker = L.marker([parseFloat(defect.Lat), parseFloat(defect.Lng)], {icon: icon});
+        var marker = L.marker([parseFloat(defect.Lat), parseFloat(defect.Lng)], { icon: icon });
         mapLayer.addLayer(marker);
 
 

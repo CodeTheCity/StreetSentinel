@@ -2,39 +2,43 @@
 title: "Home"
 ---
 
-<h1>Overview</h1>
+<h2>Overview</h2>
 <div class="row row-cols-1 row-cols-md-3 g-4">
     <div class="col">
-        <div class="card">
+        <div class="card h-100">
             <div class="card-body">
                 <p class="card-title h4">No. of outstanding defects</p>
                 <p class="card-text text-center fs-1 fw-bold" id="defectTotal">
-                    ##
+                    
                 </p>
             </div>
         </div>
     </div>
     <div class="col">
-        <div class="card">
+        <div class="card h-100">
             <div class="card-body">
                 <p class="card-title h4">Oldest outstanding defect</p>
                 <p class="card-text text-center fs-1 fw-bold" id="oldestDefect">
-                    ##
+                    
                 </p>
             </div>
         </div>
     </div>
     <div class="col">
-        <div class="card">
-            <div class="card-body h4">
-                <p class="card-title">Most common defect</p>
+        <div class="card h-100">
+            <div class="card-body">
+                <p class="card-title h4">Most common defect</p>
                 <p class="card-text text-center fs-1 fw-bold" id="mostCommonDefect">
-                    ##
+                    
                 </p>
             </div>
         </div>
     </div>
 </div>
+
+<h2>Map</h2>
+
+<div id="map" style="height:400px;"></div>
 
 <script id="roadsData" type="application/json">
     {{ site.data.roads | jsonify }}
@@ -68,6 +72,23 @@ title: "Home"
 
     mostCommonDefectElement.innerHTML = `${mostCommonDefect}<br>${defectTypes[mostCommonDefect].length.toLocaleString()} reports`;
 
-    debugger;
+    var map = L.map('map').setView([57.148690, -2.099241], 11);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    var mapLayer = L.markerClusterGroup();
+
+    roadsData.forEach(defect => {
+
+        var marker = L.marker([parseFloat(defect.Lat),parseFloat(defect.Lng)]);
+        mapLayer.addLayer(marker);
+
+        
+    });
+
+    mapLayer.addTo(map);
+
 
 </script>
